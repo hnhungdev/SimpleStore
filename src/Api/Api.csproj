@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="MassTransit.RabbitMQ" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Modules\Catalog\Catalog.Api\Catalog.Api.csproj" />
+    <ProjectReference Include="..\Modules\Cart\Cart.Api\Cart.Api.csproj" />
+    <ProjectReference Include="..\Modules\Inventory\Inventory.Api\Inventory.Api.csproj" />
+    <ProjectReference Include="..\Modules\Order\Order.Api\Order.Api.csproj" /> 
+    <ProjectReference Include="..\Modules\Payment\Payment.Api\Payment.Api.csproj" />
+    <ProjectReference Include="..\Modules\Notification\Notification.Api\Notification.Api.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Identity.Api\Identity.Api.csproj" />
+  </ItemGroup>
+
+</Project>

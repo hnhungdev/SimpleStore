@@ -1,0 +1,105 @@
+services:
+  sql-server:
+    image: ${MSSQL_IMAGE_NAME}
+    container_name: sql-server
+    restart: unless-stopped
+    user: root
+    volumes:
+      - ./docker-volumes/sql-server/data:/var/opt/mssql/data
+      - ./docker-volumes/sql-server/log:/var/opt/mssql/log
+    ports:
+      - ${MSSQL_PORT}:1433
+    environment:
+      SA_PASSWORD: ${MSSQL_PASSWORD}
+      ACCEPT_EULA: "Y"
+    networks:
+      - simple_store_network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "${MSSQL_PASSWORD}" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  minio:
+    image: ${MINIO_IMAGE_NAME}
+    container_name: minio
+    command: server --console-address ":9001" /data
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_PROMETHEUS_AUTH_TYPE: public
+    hostname: minio
+    ports:
+      - ${MINIO_API_PORT}:9000
+      - ${MINIO_UI_PORT}:9001
+    volumes:
+      - ./docker-volumes/minio:/data
+    networks:
+      - simple_store_network
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: ${REDIS_IMAGE_NAME}
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - ${REDIS_PORT}:6379
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - ./docker-volumes/redis:/data
+    networks:
+      - simple_store_network
+
+  redisinsight:
+    image: ${REDISINSIGHT_IMAGE_NAME:-redis/redisinsight:latest}
+    container_name: redisinsight
+    restart: unless-stopped
+    ports:
+      - ${REDISINSIGHT_PORT:-5540}:5540
+    volumes:
+      - ./docker-volumes/redisinsight:/data
+    networks:
+      - simple_store_network
+    depends_on:
+      - redis
+
+  rabbitmq:
+    image: ${RABBITMQ_IMAGE_NAME}
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - ${RABBITMQ_CONNECT_PORT}:5672
+      - ${RABBITMQ_UI_PORT}:15672
+      - ${RABBITMQ_METRICS_PORT}:15692
+    volumes:
+      - ./docker-volumes/rabbitmq:/var/lib/rabbitmq
+      - ./config/rabbitmq/rabbitmq_enabled_plugins:/etc/rabbitmq/enabled_plugins
+    networks:
+      - simple_store_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  mailhog:
+    image: ${MAILHOG_IMAGE_NAME}
+    container_name: mailhog
+    restart: unless-stopped
+    ports:
+      - ${MAILHOG_SMTP_PORT}:1025
+      - ${MAILHOG_WEB_UI}:8025
+    networks:
+      - simple_store_network
+
+networks:
+  simple_store_network:

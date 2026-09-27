@@ -1,0 +1,82 @@
+```gitignore
+# =========================
+# .NET / Visual Studio
+# =========================
+
+*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+nupkg/
+
+.vs/
+.vscode/
+.idea/
+
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+
+# =========================
+# Node / Frontend tooling
+# =========================
+
+node_modules/
+.pnp/
+.pnp.js
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+coverage/
+
+
+# =========================
+# Environment / Secrets
+# =========================
+
+.env
+.env.*
+!.env.example
+
+# Local application settings
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+
+# =========================
+# Local data
+# =========================
+
+local-data/
+docker-volumes/
+
+
+# =========================
+# OS
+# =========================
+
+.DS_Store
+Thumbs.db
+```
